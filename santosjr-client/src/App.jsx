@@ -6,6 +6,11 @@ import ProductPage from './pages/LandingPages/ProductPage';
 import HomePage from './pages/LandingPages/HomePage';
 import AboutPage from './pages/LandingPages/AboutPage';
 import ProductListPage from './pages/LandingPages/ProductListPage';
+import CartPage from './pages/LandingPages/CartPage';
+import DashLayout from './layouts/DashLayout';
+import DashboardPage from './pages/DashboardPages/DashboardPage';
+import ReportsPage from './pages/DashboardPages/ReportsPage';
+import UsersPage from './pages/DashboardPages/UsersPage';
 
 // Auth Pages Structure
 import AuthLayout from './layouts/AuthLayout';
@@ -36,6 +41,10 @@ const routes = [
         path: 'products/:name',
         element: <ProductPage />,
       },
+      {
+        path: 'cart',
+        element: <CartPage />,
+      },
     ],
   },
   {
@@ -51,6 +60,25 @@ const routes = [
         path: "signup",
         element: <SignUpPage />,
       }
+    ],
+  },
+  {
+    path: 'dashboard',
+    element: <DashLayout />,
+    errorElement: <NotFoundPage />,
+    children: [
+      {
+        path: '',
+        element: <DashboardPage />,
+      },
+      {
+        path: 'reports',
+        element: <ReportsPage />,
+      },
+      {
+        path: 'users',
+        element: <UsersPage />,
+      },
     ],
   },
 ];

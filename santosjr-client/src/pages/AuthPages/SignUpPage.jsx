@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../components/Button';
+import { registerUser } from '../../utils/store';
 
 const inputClasses =
   'mt-2 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
@@ -7,6 +10,68 @@ const inputClasses =
 const actionButtonClassName = 'w-full rounded-xl py-3 text-[11px] tracking-[0.2em]';
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+
+    const fieldMap = {
+      'first-name': 'firstName',
+      'last-name': 'lastName',
+      'signup-email': 'email',
+      'signup-password': 'password',
+    };
+
+    setFormData((currentData) => ({
+      ...currentData,
+      [fieldMap[id]]: value,
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim()
+    ) {
+      setErrorMessage('Please complete all fields before creating your account.');
+      setSuccessMessage('');
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setErrorMessage('Please use a password with at least 8 characters.');
+      setSuccessMessage('');
+      return;
+    }
+
+    const result = registerUser(formData);
+
+    if (!result.ok) {
+      setErrorMessage(result.message);
+      setSuccessMessage('');
+      return;
+    }
+
+    setErrorMessage('');
+    setSuccessMessage(`Account created for ${result.user.firstName}. Redirecting to products...`);
+
+    window.setTimeout(() => {
+      navigate('/products');
+    }, 700);
+  };
+
   return (
     <>
       <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">Sign Up</h1>
@@ -14,7 +79,7 @@ const SignUpPage = () => {
         Create a store account for faster checkout, order updates, and pickup details.
       </p>
 
-      <form className="mt-8 space-y-5">
+      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="first-name" className="text-sm font-medium text-zinc-700">
@@ -25,6 +90,8 @@ const SignUpPage = () => {
               type="text"
               placeholder="First name"
               autoComplete="given-name"
+              value={formData.firstName}
+              onChange={handleChange}
               className={inputClasses}
             />
           </div>
@@ -37,6 +104,8 @@ const SignUpPage = () => {
               type="text"
               placeholder="Last name"
               autoComplete="family-name"
+              value={formData.lastName}
+              onChange={handleChange}
               className={inputClasses}
             />
           </div>
@@ -51,6 +120,8 @@ const SignUpPage = () => {
             type="email"
             placeholder="student@email.com"
             autoComplete="email"
+            value={formData.email}
+            onChange={handleChange}
             className={inputClasses}
           />
         </div>
@@ -64,6 +135,8 @@ const SignUpPage = () => {
             type="password"
             placeholder="Password"
             autoComplete="new-password"
+            value={formData.password}
+            onChange={handleChange}
             className={inputClasses}
           />
           <p className="mt-2 text-xs leading-5 text-zinc-500">
@@ -74,6 +147,14 @@ const SignUpPage = () => {
         <Button type="submit" variant="primary" className={actionButtonClassName}>
           Create Account
         </Button>
+
+        {errorMessage ? (
+          <p className="text-sm font-medium text-red-600">{errorMessage}</p>
+        ) : null}
+
+        {successMessage ? (
+          <p className="text-sm font-medium text-emerald-700">{successMessage}</p>
+        ) : null}
 
         <div className="grid gap-3 pt-2 sm:grid-cols-2">
           <Button type="button" variant="secondary" className={actionButtonClassName}>

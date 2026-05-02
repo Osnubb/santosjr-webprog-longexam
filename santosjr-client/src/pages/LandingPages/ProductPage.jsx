@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Button from '../../components/Button.jsx';
-import products from '../../assets/product-content.js'
+import products from '../../assets/product-content.js';
+import { addToCart } from '../../utils/store.js';
 
 function ProductPage() {
   const { name } = useParams();
   const product = products.find(product => product.name === name);
+  const [cartMessage, setCartMessage] = useState('');
 
   if (!product) {
     return (
@@ -18,6 +21,12 @@ function ProductPage() {
       </div>
     );
   }
+
+  const handleAddToCart = () => {
+    const updatedCart = addToCart(product);
+    const cartItem = updatedCart.find((item) => item.name === product.name);
+    setCartMessage(`${product.title} added to cart. Quantity: ${cartItem?.quantity ?? 1}.`);
+  };
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -42,10 +51,12 @@ function ProductPage() {
 
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-8 flex aspect-4/3 items-center justify-center rounded-[1.25rem] border-2 border-zinc-900 bg-zinc-200">
-            <div className="flex h-24 w-24 items-center justify-center border-2 border-zinc-300 bg-zinc-100 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-              Item
-            </div>
+          <div className="mb-8 overflow-hidden rounded-[1.25rem] border-2 border-zinc-900 bg-zinc-200">
+            <img
+              src={product.imageUrl}
+              alt={product.title}
+              className="aspect-4/3 w-full object-cover"
+            />
           </div>
 
           <div className="prose prose-sm max-w-none space-y-4 text-zinc-700">
@@ -57,8 +68,11 @@ function ProductPage() {
           </div>
 
           <div className="mt-8 border-t-2 border-zinc-900 pt-6">
-            <Button variant="primary" className="mr-3">Add to Cart</Button>
+            <Button variant="primary" className="mr-3" onClick={handleAddToCart}>Add to Cart</Button>
             <Button to="/products">Back to Products</Button>
+            {cartMessage ? (
+              <p className="mt-4 text-sm font-medium text-zinc-700">{cartMessage}</p>
+            ) : null}
           </div>
         </div>
       </section>
