@@ -4,6 +4,18 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import LinearProgress from '@mui/material/LinearProgress';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import L from 'leaflet';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const summaryCards = [
   { label: 'Total Orders', value: '248', note: '+18 this week' },
@@ -25,6 +37,8 @@ const recentActivities = [
   'Three new users signed up before noon.',
   'Wireless Study Lamp orders increased after the product update.',
 ];
+
+const storeLocation = [14.5995, 120.9842];
 
 const DashboardPage = () => {
   return (
@@ -110,6 +124,23 @@ const DashboardPage = () => {
           </Paper>
         </Grid>
       </Grid>
+
+      <Paper sx={{ p: 3, borderRadius: 4 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+          Map
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Sample store and pickup location for the dashboard section.
+        </Typography>
+        <div style={{ height: 400, width: '100%', overflow: 'hidden', borderRadius: 24 }}>
+          <MapContainer center={storeLocation} zoom={13} style={{ height: '100%', width: '100%' }}>
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <Marker position={storeLocation}>
+              <Popup>BulldogEx Shop Pickup Point</Popup>
+            </Marker>
+          </MapContainer>
+        </div>
+      </Paper>
     </Stack>
   );
 };
